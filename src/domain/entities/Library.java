@@ -41,22 +41,6 @@ public class Library {
         customers.add(customer);
     }
 
-    public List<Book> getAllBooks() {
-        return books.stream().toList();
-    }
-
-    public Map<Customer, Loan> getAllLoans() {
-        loans.entrySet().stream()
-                .map(entry -> String.format("Cliente: %s | Empréstimo: %s", entry.getKey(), entry.getValue()))
-                .forEach(System.out::println);
-
-        return loans;
-    }
-
-    public List<Author> getAllAuthors() {
-        return authors.stream().toList();
-    }
-
     public void addLoan(Customer customer, Book book) throws LoanAlreadyMade {
         if (!book.getIsAvailable()) {
             throw new LoanAlreadyMade("Operação inválida! Livro já foi emprestado");
@@ -64,5 +48,36 @@ public class Library {
             book.setIsAvailable(false);
             loans.put(customer, new Loan(customer, book, LocalDate.now()));
         }
+    }
+
+    public List<Book> getAllBooks() {
+        return books.stream().toList();
+    }
+
+    public List<Author> getAllAuthors() {
+        return authors.stream().toList();
+    }
+
+    public List<Customer> getAllCustomers() {
+        return customers.stream().toList();
+    }
+
+    public List<String> getAllLoans() {
+        return loans.entrySet().stream().map(entry -> String.format("Cliente: %s | Empréstimo: %s",
+                entry.getKey(), entry.getValue())).toList();
+    }
+
+    public Book getBookByTitle(String bookTitle) {
+        return books.stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(bookTitle.toLowerCase()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Book getBookByAuthor(String authorName) {
+        return books.stream()
+                .filter(book -> book.getAuthor().getName().toLowerCase().contains(authorName.toLowerCase()))
+                .findFirst()
+                .orElse(null);
     }
 }
