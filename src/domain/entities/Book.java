@@ -10,17 +10,16 @@ public class Book {
     private Author author;
     private Boolean isAvailable;
     private LocalDate createdAt;
-    private LocalDate updatedAt;
 
     public Book() {
     }
 
-    public Book(String title, Author author) {
+    public Book(String title, Author author, LocalDate createdAt) {
         this.id = UUID.randomUUID();
         this.title = title;
         this.author = author;
         this.isAvailable = true;
-        this.createdAt = LocalDate.now();
+        this.createdAt = createdAt;
     }
 
     public UUID getId() {
@@ -63,13 +62,6 @@ public class Book {
         this.createdAt = createdAt;
     }
 
-    public LocalDate getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDate updatedAt) {
-        this.updatedAt = updatedAt;
-    }
 
     @Override
     public String toString() {
