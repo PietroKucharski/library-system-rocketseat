@@ -43,9 +43,12 @@ public class Author {
         this.birthDate = birthDate;
     }
 
-    @Override
     public String toString() {
-        return "Author {" + id + name + birthDate + "}";
+        return "Author {" +
+                "\n  ID: " + id +
+                "\n  Name: " + name +
+                "\n  Birth Date: " + birthDate +
+                "\n}";
     }
 
 

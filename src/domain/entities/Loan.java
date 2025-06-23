@@ -38,7 +38,12 @@ public class Loan {
     @Override
     public String toString() {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-        return "Loan {" + customer + ", " + book + ", " + loanDay.format(formatter) + ", " + loanReturn.format(formatter) + "}";
+        return "Empréstimo {" +
+                "\n  Usuário: '" + customer + '\'' +
+                ",\n  Livro: " + book +
+                ",\n  Data do Empréstimo: " + loanDay.format(formatter) +
+                ",\n  Data de Devolução: " + loanReturn.format(formatter) +
+                "\n}";
     }
 
 }

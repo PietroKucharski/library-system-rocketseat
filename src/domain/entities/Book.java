@@ -63,9 +63,11 @@ public class Book {
     }
 
 
-    @Override
     public String toString() {
-        return "Book {" + id + ", " + title + ", " + author + ", " + (isAvailable ? "Yes" : "No") + "}";
+        return "Book {" +
+                "\n  Title: " + title +
+                "\n  Author: " + author.getName() + // ou author.toString() para detalhes completos
+                "\n}";
     }
 
     @Override
