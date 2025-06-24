@@ -108,10 +108,9 @@ public class Library {
                 .orElseThrow(BookNotFoundException::new);
     }
 
-    public Book getBookByAuthor(String authorName) {
+    public List<Book> getBooksByAuthor(String authorName) {
         return books.stream()
                 .filter(book -> book.getAuthor().getName().toLowerCase().contains(authorName.toLowerCase()))
-                .findFirst()
-                .orElse(null);
+                .toList();
     }
 }
