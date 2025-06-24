@@ -40,10 +40,10 @@ public class Library {
     }
 
     public void addLoan(Customer customer, Book book) throws LoanAlreadyMade {
-        if (!book.getIsAvailable()) {
+        if (!book.getAvailable()) {
             throw new LoanAlreadyMade("Operação inválida! Livro já foi emprestado");
         } else {
-            book.setIsAvailable(false);
+            book.setAvailable(false);
             loans.computeIfAbsent(customer, k -> new ArrayList<>()).add(new Loan(customer, book, LocalDate.now()));
         }
     }
@@ -61,7 +61,7 @@ public class Library {
                             .orElse(null);
 
                     if (loanToReturn != null) {
-                        loanToReturn.getBook().setIsAvailable(true);
+                        loanToReturn.getBook().setAvailable(true);
                         loanToReturn.setLoanReturnDate(LocalDate.now());
                     }
                 });
