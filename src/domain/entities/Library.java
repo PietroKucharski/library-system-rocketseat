@@ -95,6 +95,12 @@ public class Library {
                 .orElse(List.of());
     }
 
+    public List<Loan> getLoanByBookTitle(String bookTitle) {
+        return loans.values().stream()
+                .flatMap(List::stream) //
+                .filter(loan -> loan.getBook().getTitle().equalsIgnoreCase(bookTitle)).toList();
+    }
+
     public Book getBookByTitle(String bookTitle) {
         return books.stream()
                 .filter(book -> book.getTitle().toLowerCase().contains(bookTitle.toLowerCase()))
