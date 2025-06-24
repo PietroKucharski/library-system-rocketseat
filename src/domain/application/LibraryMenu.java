@@ -65,6 +65,7 @@ public class LibraryMenu {
             case 8 -> getLoanByBookTitle();
             case 9 -> library.getAllBooks().forEach(System.out::println);
             case 10 -> getBookByTitle();
+            case 11 -> getBookByAuthor();
             case 0 -> System.out.println("Encerrando o sistema...");
             default -> System.out.println("Opção inválida.");
         }
