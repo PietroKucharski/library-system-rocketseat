@@ -65,8 +65,9 @@ public class Book {
 
     public String toString() {
         return "Book {" +
+                "\n  ID: " + id +
                 "\n  Title: " + title +
-                "\n  Author: " + author.getName() + // ou author.toString() para detalhes completos
+                "\n  Author: " + author.getName() +
                 "\n}";
     }
 

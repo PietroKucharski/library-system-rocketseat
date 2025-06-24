@@ -44,10 +44,11 @@ public class Author {
     }
 
     public String toString() {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         return "Author {" +
                 "\n  ID: " + id +
                 "\n  Name: " + name +
-                "\n  Birth Date: " + birthDate +
+                "\n  Birth Date: " + birthDate.format(formatter) +
                 "\n}";
     }
 
