@@ -1,5 +1,6 @@
 package domain.entities;
 
+import domain.exceptions.BookNotFoundException;
 import domain.exceptions.LoanAlreadyMade;
 
 import java.time.LocalDate;
@@ -8,7 +9,7 @@ import java.util.*;
 public class Library {
     private List<Book> books;
     private List<Author> authors;
-    private Map<Customer, Loan> loans;
+    private Map<Customer, List<Loan>> loans;
     private List<Customer> customers;
 
     public Library() {
@@ -43,8 +44,27 @@ public class Library {
             throw new LoanAlreadyMade("Operação inválida! Livro já foi emprestado");
         } else {
             book.setIsAvailable(false);
-            loans.put(customer, new Loan(customer, book, LocalDate.now()));
+            loans.computeIfAbsent(customer, k -> new ArrayList<>()).add(new Loan(customer, book, LocalDate.now()));
         }
+    }
+
+    public void returnLoan(String customerEmail, String bookTitle) {
+        loans.entrySet().stream()
+                .filter(entry -> entry.getKey().getEmail().equalsIgnoreCase(customerEmail))
+                .findFirst()
+                .ifPresent(entry -> {
+                    List<Loan> loanList = entry.getValue();
+
+                    Loan loanToReturn = loanList.stream()
+                            .filter(loan -> loan.getBook().getTitle().equalsIgnoreCase(bookTitle))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (loanToReturn != null) {
+                        loanToReturn.getBook().setIsAvailable(true);
+                        loanToReturn.setLoanReturnDate(LocalDate.now());
+                    }
+                });
     }
 
     public List<Book> getAllBooks() {
@@ -66,20 +86,20 @@ public class Library {
                 .toList();
     }
 
-    public Loan getLoanByCustomer(UUID customerId) {
+    public List<Loan> getLoanByCustomer(String customerEmail) {
         return loans.entrySet()
                 .stream()
-                .filter(entry -> entry.getKey().getId().equals(customerId))
+                .filter(entry -> entry.getKey().getEmail().equalsIgnoreCase(customerEmail))
                 .map(Map.Entry::getValue)
                 .findFirst()
-                .orElse(null);
+                .orElse(List.of());
     }
 
     public Book getBookByTitle(String bookTitle) {
         return books.stream()
                 .filter(book -> book.getTitle().toLowerCase().contains(bookTitle.toLowerCase()))
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(BookNotFoundException::new);
     }
 
     public Book getBookByAuthor(String authorName) {
