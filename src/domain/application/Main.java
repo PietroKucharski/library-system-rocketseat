@@ -13,6 +13,9 @@ public class Main {
     public static void main(String[] args) throws LoanAlreadyMade {
         Library library = new Library();
         Customer customer = new Customer("Pietro", "pietro@email.com", LocalDate.of(2002, 6, 13));
+        Customer customer2 = new Customer("Mariana", "mariana@email.com", LocalDate.of(1998, 11, 25));
+        Customer customer3 = new Customer("Carlos", "carlos@email.com", LocalDate.of(1990, 3, 7));
+
 
         Author author1 = new Author("Carlos Drummond", LocalDate.of(1902, 10, 31));
         Book book1 = new Book("A Rosa do Povo", author1, LocalDate.of(1902, 10, 31));
@@ -25,10 +28,14 @@ public class Main {
 
         library.addAllBook(Arrays.asList(book1, book2, book3));
         library.addAllAuthor(Arrays.asList(author1, author2, author3));
+
         library.addCustomer(customer);
+        library.addCustomer(customer2);
+        library.addCustomer(customer3);
 
         library.addLoan(customer, book1);
-        library.addLoan(customer, book2);
+        library.addLoan(customer2, book2);
+        library.addLoan(customer3, book3);
 
         /* Métodos dos livros */
 //        System.out.println(library.getAllBooks());
@@ -41,11 +48,11 @@ public class Main {
 //        System.out.println(library.getAllCustomers());
 
         /* Métodos dos empréstimos */
-        System.out.println(library.getAllLoans());
-        library.returnLoan("pietro@email.com", "A Rosa do Povo");
-        System.out.println("--------------------");
-        System.out.println(library.getAllLoans());
-
+//        System.out.println(library.getAllLoans());
+//        library.returnLoan("pietro@email.com", "A Rosa do Povo");
+//        System.out.println("--------------------");
+//        System.out.println(library.getAllLoans());
 //        System.out.println(library.getLoanByCustomer(customer.getEmail()));
+        System.out.println(library.getLoanByBookTitle("A Rosa do Povo"));
     }
 }
