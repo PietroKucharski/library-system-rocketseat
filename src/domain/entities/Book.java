@@ -9,17 +9,19 @@ public class Book {
     private String title;
     private Author author;
     private Boolean isAvailable;
-    private LocalDate createdAt;
+    private LocalDate registeredBookDate;
+    private LocalDate updatedBookDate;
 
     public Book() {
     }
 
-    public Book(String title, Author author, LocalDate createdAt) {
+    public Book(String title, Author author) {
         this.id = UUID.randomUUID();
         this.title = title;
         this.author = author;
         this.isAvailable = true;
-        this.createdAt = createdAt;
+        this.registeredBookDate = LocalDate.now();
+        this.updatedBookDate = LocalDate.now();
     }
 
     public UUID getId() {
@@ -28,6 +30,7 @@ public class Book {
 
     public void setId(UUID id) {
         this.id = id;
+        setUpdatedBookDate();
     }
 
     public String getTitle() {
@@ -36,6 +39,7 @@ public class Book {
 
     public void setTitle(String title) {
         this.title = title;
+        setUpdatedBookDate();
     }
 
     public Author getAuthor() {
@@ -44,24 +48,33 @@ public class Book {
 
     public void setAuthor(Author author) {
         this.author = author;
+        setUpdatedBookDate();
+
     }
 
-    public Boolean getIsAvailable() {
+    public Boolean getAvailable() {
         return isAvailable;
     }
 
-    public void setIsAvailable(Boolean isAvailable) {
-        this.isAvailable = isAvailable;
+    public void setAvailable(Boolean available) {
+        isAvailable = available;
+        }
+
+    public LocalDate getRegisteredBookDate() {
+        return registeredBookDate;
     }
 
-    public LocalDate getCreatedAt() {
-        return createdAt;
+    public void setRegisteredBookDate(LocalDate registeredBookDate) {
+        this.registeredBookDate = registeredBookDate;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
+    public LocalDate getUpdatedBookDate() {
+        return updatedBookDate;
     }
 
+    public void setUpdatedBookDate() {
+        this.updatedBookDate = LocalDate.now();
+    }
 
     public String toString() {
         return "Book {" +
