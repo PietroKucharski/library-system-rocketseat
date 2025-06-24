@@ -8,6 +8,7 @@ public class Loan {
     private Book book;
     private LocalDate loanDay;
     private LocalDate loanReturn;
+    private LocalDate loanReturnDate;
 
     public Loan() {
     }
@@ -42,7 +43,8 @@ public class Loan {
                 "\n  Usuário: '" + customer + '\'' +
                 ",\n  Livro: " + book +
                 ",\n  Data do Empréstimo: " + loanDay.format(formatter) +
-                ",\n  Data de Devolução: " + loanReturn.format(formatter) +
+//                ",\n  Data de Devolução : " + loanReturnDate.format(formatter) +
+                ",\n  Data para Devolução: " + loanReturn.format(formatter) +
                 "\n}";
     }
 
