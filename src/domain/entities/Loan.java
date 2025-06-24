@@ -28,12 +28,36 @@ public class Loan {
         this.customer = customer;
     }
 
+    public Book getBook() {
+        return book;
+    }
+
+    public void setBook(Book book) {
+        this.book = book;
+    }
+
     public LocalDate getLoanDay() {
         return loanDay;
     }
 
     public void setLoanDay(LocalDate loanDay) {
         this.loanDay = loanDay;
+    }
+
+    public LocalDate getLoanReturn() {
+        return loanReturn;
+    }
+
+    public void setLoanReturn(LocalDate loanReturn) {
+        this.loanReturn = loanReturn;
+    }
+
+    public LocalDate getLoanReturnDate() {
+        return loanReturnDate;
+    }
+
+    public void setLoanReturnDate(LocalDate loanReturnDate) {
+        this.loanReturnDate = loanReturnDate;
     }
 
     @Override
