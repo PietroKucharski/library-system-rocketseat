@@ -3,10 +3,7 @@ package domain.entities;
 import domain.exceptions.LoanAlreadyMade;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Library {
     private List<Book> books;
@@ -63,8 +60,19 @@ public class Library {
     }
 
     public List<String> getAllLoans() {
-        return loans.entrySet().stream().map(entry -> String.format("Cliente: %s | Empréstimo: %s",
-                entry.getKey(), entry.getValue())).toList();
+        return loans.entrySet()
+                .stream()
+                .map(entry -> String.format("\n Cliente: %s | \n %s", entry.getKey(), entry.getValue()))
+                .toList();
+    }
+
+    public Loan getLoanByCustomer(UUID customerId) {
+        return loans.entrySet()
+                .stream()
+                .filter(entry -> entry.getKey().getId().equals(customerId))
+                .map(Map.Entry::getValue)
+                .findFirst()
+                .orElse(null);
     }
 
     public Book getBookByTitle(String bookTitle) {
