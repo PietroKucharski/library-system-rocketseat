@@ -28,11 +28,24 @@ public class Main {
         library.addCustomer(customer);
 
         library.addLoan(customer, book1);
+        library.addLoan(customer, book2);
 
+        /* Métodos dos livros */
 //        System.out.println(library.getAllBooks());
+//        System.out.println(library.getBookByTitle("teste"));
+
+        /* Métodos dos autores */
 //        System.out.println(library.getAllAuthors());
+
+        /* Métodos dos clientes */
 //        System.out.println(library.getAllCustomers());
-        System.out.println(library.getLoanByCustomer(customer.getId()));
-//        System.out.println(library.getAllLoans());
+
+        /* Métodos dos empréstimos */
+        System.out.println(library.getAllLoans());
+        library.returnLoan("pietro@email.com", "A Rosa do Povo");
+        System.out.println("--------------------");
+        System.out.println(library.getAllLoans());
+
+//        System.out.println(library.getLoanByCustomer(customer.getEmail()));
     }
 }
