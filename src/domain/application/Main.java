@@ -6,53 +6,191 @@ import domain.entities.Customer;
 import domain.entities.Library;
 import domain.exceptions.LoanAlreadyMade;
 
+import java.time.DateTimeException;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws LoanAlreadyMade {
+        Scanner sc = new Scanner(System.in);
+        DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
         Library library = new Library();
-        Customer customer = new Customer("Pietro", "pietro@email.com", LocalDate.of(2002, 6, 13));
-        Customer customer2 = new Customer("Mariana", "mariana@email.com", LocalDate.of(1998, 11, 25));
-        Customer customer3 = new Customer("Carlos", "carlos@email.com", LocalDate.of(1990, 3, 7));
 
+        int userInput;
 
-        Author author1 = new Author("Carlos Drummond", LocalDate.of(1902, 10, 31));
-        Book book1 = new Book("A Rosa do Povo", author1, LocalDate.of(1902, 10, 31));
+        do {
+            System.out.println("\n==== MENU ====");
+            System.out.println("1 - Cadastrar livro");
+            System.out.println("2 - Cadastrar autor");
+            System.out.println("3 - Cadastrar cliente");
+            System.out.println("4 - Realizar empréstimo");
+            System.out.println("5 - Devolver livro");
+            System.out.println("6 - Ver todos os empréstimos");
+            System.out.println("7 - Ver empréstimo por cliente");
+            System.out.println("8 - Ver empréstimo por título do livro");
+            System.out.println("9 - Ver todos os livros");
+            System.out.println("10 - Buscar livro por título");
+            System.out.println("11 - Buscar livros por autor");
+            System.out.println("0 - Sair");
+            System.out.print("Escolha uma opção: ");
 
-        Author author2 = new Author("Clarice Lispector", LocalDate.of(1920, 12, 10));
-        Book book2 = new Book("A Hora da Estrela", author2, LocalDate.of(1902, 10, 31));
+            userInput = sc.nextInt();
+            sc.nextLine();
 
-        Author author3 = new Author("George Orwell", LocalDate.of(1903, 6, 25));
-        Book book3 = new Book("1984", author3, LocalDate.of(1902, 10, 31));
+            switch (userInput) {
+                case 1: {
+                    if (library.getAllAuthors().isEmpty()) {
+                        System.out.println("Cadastre um autor antes de adicionar um livro.");
+                        break;
+                    }
 
-        library.addAllBook(Arrays.asList(book1, book2, book3));
-        library.addAllAuthor(Arrays.asList(author1, author2, author3));
+                    System.out.print("Digite o título do livro: ");
+                    String title = sc.nextLine();
 
-        library.addCustomer(customer);
-        library.addCustomer(customer2);
-        library.addCustomer(customer3);
+                    System.out.println("Selecione o autor:");
+                    for (int i = 0; i < library.getAllAuthors().size(); i++) {
+                        System.out.println((i + 1) + " - " + library.getAllAuthors().get(i));
+                    }
 
-        library.addLoan(customer, book1);
-        library.addLoan(customer2, book2);
-        library.addLoan(customer3, book3);
+                    int selected = sc.nextInt();
+                    sc.nextLine();
+                    if (selected < 1 || selected > library.getAllAuthors().size()) {
+                        System.out.println("Autor inválido.");
+                        break;
+                    }
 
-        /* Métodos dos livros */
-//        System.out.println(library.getAllBooks());
-//        System.out.println(library.getBookByTitle("teste"));
+                    Author selectedAuthor = library.getAllAuthors().get(selected - 1);
+                    library.addBook(new Book(title, selectedAuthor));
+                    System.out.println("Livro adicionado com sucesso.");
+                    break;
+                }
+                case 2: {
+                    System.out.print("Digite o nome do autor: ");
+                    String authorName = sc.nextLine();
 
-        /* Métodos dos autores */
-//        System.out.println(library.getAllAuthors());
+                    System.out.print("Digite a data de nascimento (dd/MM/yyyy): ");
+                    String authorBirthDate = sc.nextLine();
 
-        /* Métodos dos clientes */
-//        System.out.println(library.getAllCustomers());
+                    try {
+                        LocalDate birthDate = LocalDate.parse(authorBirthDate, dtf);
+                        library.addAuthor(new Author(authorName, birthDate));
+                        System.out.println("Autor cadastrado com sucesso.");
+                    } catch (DateTimeException e) {
+                        System.out.println("Data inválida.");
+                    }
+                    break;
+                }
+                case 3: {
+                    System.out.print("Digite o nome do cliente: ");
+                    String customerName = sc.nextLine();
 
-        /* Métodos dos empréstimos */
-//        System.out.println(library.getAllLoans());
-//        library.returnLoan("pietro@email.com", "A Rosa do Povo");
-//        System.out.println("--------------------");
-//        System.out.println(library.getAllLoans());
-//        System.out.println(library.getLoanByCustomer(customer.getEmail()));
-        System.out.println(library.getLoanByBookTitle("A Rosa do Povo"));
+                    System.out.print("Digite o email do cliente: ");
+                    String customerEmail = sc.nextLine();
+
+                    System.out.print("Digite a data de nascimento (dd/MM/yyyy): ");
+                    String birthDateStr = sc.nextLine();
+
+                    try {
+                        LocalDate birthDate = LocalDate.parse(birthDateStr, dtf);
+                        library.addCustomer(new Customer(customerName, customerEmail, birthDate));
+                        System.out.println("Cliente cadastrado com sucesso.");
+                    } catch (DateTimeException e) {
+                        System.out.println("Data inválida.");
+                    }
+                    break;
+                }
+                case 4: {
+                    if (library.getAllCustomers().isEmpty() || library.getAllBooks().isEmpty()) {
+                        System.out.println("É necessário ter clientes e livros cadastrados.");
+                        break;
+                    }
+
+                    System.out.println("Selecione o cliente:");
+                    for (int i = 0; i < library.getAllCustomers().size(); i++) {
+                        System.out.println((i + 1) + " - " + library.getAllCustomers().get(i));
+                    }
+                    int selectedCustomer = sc.nextInt();
+                    sc.nextLine();
+
+                    if (selectedCustomer < 1 || selectedCustomer > library.getAllCustomers().size()) {
+                        System.out.println("Cliente inválido.");
+                        break;
+                    }
+                    Customer customer = library.getAllCustomers().get(selectedCustomer - 1);
+
+                    System.out.println("Selecione o livro:");
+                    for (int i = 0; i < library.getAllBooks().size(); i++) {
+                        System.out.println((i + 1) + " - " + library.getAllBooks().get(i));
+                    }
+                    int selectedBook = sc.nextInt();
+                    sc.nextLine();
+
+                    if (selectedBook < 1 || selectedBook > library.getAllBooks().size()) {
+                        System.out.println("Livro inválido.");
+                        break;
+                    }
+
+                    Book book = library.getAllBooks().get(selectedBook - 1);
+                    library.addLoan(customer, book);
+                    System.out.println("Empréstimo realizado.");
+                    break;
+                }
+                case 5: {
+                    System.out.print("Digite o email do cliente: ");
+                    String email = sc.nextLine();
+
+                    System.out.print("Digite o título do livro: ");
+                    String title = sc.nextLine();
+
+                    library.returnLoan(email, title);
+                    System.out.println("Devolução registrada.");
+                    break;
+                }
+                case 6: {
+                    System.out.println("Todos os empréstimos:");
+                    System.out.println(library.getAllLoans());
+                    break;
+                }
+                case 7: {
+                    System.out.print("Digite o email do cliente: ");
+                    String email = sc.nextLine();
+                    System.out.println(library.getLoanByCustomer(email));
+                    break;
+                }
+                case 8: {
+                    System.out.print("Digite o título do livro: ");
+                    String title = sc.nextLine();
+                    System.out.println(library.getLoanByBookTitle(title));
+                    break;
+                }
+                case 9: {
+                    System.out.println("Livros cadastrados:");
+                    System.out.println(library.getAllBooks());
+                    break;
+                }
+                case 10: {
+                    System.out.print("Digite o título do livro: ");
+                    String title = sc.nextLine();
+                    System.out.println(library.getBookByTitle(title));
+                    break;
+                }
+                case 11: {
+                    System.out.print("Digite o nome do autor: ");
+                    String authorName = sc.nextLine();
+                    System.out.println(library.getBooksByAuthor(authorName));
+                    break;
+                }
+                case 0: {
+                    System.out.println("Encerrando aplicação...");
+                    break;
+                }
+                default: {
+                    System.out.println("Opção inválida. Tente novamente.");
+                }
+            }
+
+        } while (userInput != 0);
+        sc.close();
     }
 }
