@@ -1,116 +1,83 @@
 package domain.entities;
 
-import domain.exceptions.BookNotFoundException;
-import domain.exceptions.LoanAlreadyMade;
+import domain.repositories.AuthorRepository;
+import domain.repositories.BookRepository;
+import domain.repositories.CustomerRepository;
+import domain.services.LoanService;
 
 import java.time.LocalDate;
 import java.util.*;
 
 public class Library {
-    private List<Book> books;
-    private List<Author> authors;
-    private Map<Customer, List<Loan>> loans;
-    private List<Customer> customers;
+    private final AuthorRepository authorRepository;
+    private final BookRepository bookRepository;
+    private final CustomerRepository customerRepository;
+    private final LoanService loanService;
 
-    public Library() {
-        this.books = new ArrayList<>();
-        this.authors = new ArrayList<>();
-        this.loans = new HashMap<>();
-        this.customers = new ArrayList<>();
+    public Library(AuthorRepository authorRepository, BookRepository bookRepository, CustomerRepository customerRepository, LoanService loanService) {
+        this.authorRepository = authorRepository;
+        this.bookRepository = bookRepository;
+        this.customerRepository = customerRepository;
+        this.loanService = loanService;
     }
 
-    public void addBook(Book book) {
-        books.add(book);
+    public void insertAuthor(Author author) {
+        authorRepository.save(author);
     }
 
-    public void addAllBook(List<Book> allBooks) {
-        books.addAll(allBooks);
+    public void insertBook(Book book) {
+        bookRepository.save(book);
     }
 
-    public void addAuthor(Author author) {
-        authors.add(author);
+    public void insertCustomer(Customer customer) {
+        customerRepository.save(customer);
     }
 
-    public void addAllAuthor(List<Author> allAuthors) {
-        authors.addAll(allAuthors);
+    public List<Customer> getAllCustomer() {
+        return customerRepository.findAll();
     }
 
-    public void addCustomer(Customer customer) {
-        customers.add(customer);
-    }
-
-    public void addLoan(Customer customer, Book book) throws LoanAlreadyMade {
-        if (!book.getAvailable()) {
-            throw new LoanAlreadyMade("Operação inválida! Livro já foi emprestado");
-        } else {
-            book.setAvailable(false);
-            loans.computeIfAbsent(customer, k -> new ArrayList<>()).add(new Loan(customer, book, LocalDate.now()));
-        }
-    }
-
-    public void returnLoan(String customerEmail, String bookTitle) {
-        loans.entrySet().stream()
-                .filter(entry -> entry.getKey().getEmail().equalsIgnoreCase(customerEmail))
-                .findFirst()
-                .ifPresent(entry -> {
-                    List<Loan> loanList = entry.getValue();
-
-                    Loan loanToReturn = loanList.stream()
-                            .filter(loan -> loan.getBook().getTitle().equalsIgnoreCase(bookTitle))
-                            .findFirst()
-                            .orElse(null);
-
-                    if (loanToReturn != null) {
-                        loanToReturn.getBook().setAvailable(true);
-                        loanToReturn.setLoanReturnDate(LocalDate.now());
-                    }
-                });
-    }
-
-    public List<Book> getAllBooks() {
-        return books.stream().toList();
+    public Optional<Customer> getCustomerByEmail(String email) {
+        return customerRepository.findCustomerByEmail(email);
     }
 
     public List<Author> getAllAuthors() {
-        return authors.stream().toList();
+        return authorRepository.findAll();
     }
 
-    public List<Customer> getAllCustomers() {
-        return customers.stream().toList();
+    public Optional<Author> getAuthorByName(String name) {
+        return authorRepository.findByName(name);
     }
 
-    public List<String> getAllLoans() {
-        return loans.entrySet()
-                .stream()
-                .map(entry -> String.format("\n Cliente: %s | \n %s", entry.getKey(), entry.getValue()))
-                .toList();
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
     }
 
-    public List<Loan> getLoanByCustomer(String customerEmail) {
-        return loans.entrySet()
-                .stream()
-                .filter(entry -> entry.getKey().getEmail().equalsIgnoreCase(customerEmail))
-                .map(Map.Entry::getValue)
-                .findFirst()
-                .orElse(List.of());
+    public Optional<Book> getBookByTitle(String title) {
+        return bookRepository.findByTitle(title);
     }
 
-    public List<Loan> getLoanByBookTitle(String bookTitle) {
-        return loans.values().stream()
-                .flatMap(List::stream) //
-                .filter(loan -> loan.getBook().getTitle().equalsIgnoreCase(bookTitle)).toList();
+    public List<Book> getAllAuthorBooks(String name) {
+        return bookRepository.findBooksAuthor(name);
     }
 
-    public Book getBookByTitle(String bookTitle) {
-        return books.stream()
-                .filter(book -> book.getTitle().toLowerCase().contains(bookTitle.toLowerCase()))
-                .findFirst()
-                .orElseThrow(BookNotFoundException::new);
+    public void makeLoan(Customer customer, Book book) {
+        loanService.makeLoan(customer, book);
     }
 
-    public List<Book> getBooksByAuthor(String authorName) {
-        return books.stream()
-                .filter(book -> book.getAuthor().getName().toLowerCase().contains(authorName.toLowerCase()))
-                .toList();
+    public void returnLoan(Customer customer, Book book) {
+        loanService.returnLoan(customer, book);
+    }
+
+    public List<Loan> getAllLoans() {
+        return loanService.findAllLoans();
+    }
+
+    public List<Loan> getLoansByCustomer(Customer customer) {
+        return loanService.findLoansByCustomer(customer);
+    }
+
+    public Loan getLoanByBookTitle(String title) {
+        return loanService.findLoanByBookTitle(title);
     }
 }
