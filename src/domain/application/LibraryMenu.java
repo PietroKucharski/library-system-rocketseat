@@ -5,16 +5,32 @@ import domain.entities.Book;
 import domain.entities.Customer;
 import domain.entities.Library;
 import domain.exceptions.LoanAlreadyMade;
+import domain.repositories.AuthorRepository;
+import domain.repositories.BookRepository;
+import domain.repositories.CustomerRepository;
+import domain.repositories.LoanRepository;
+import domain.services.LoanService;
+import infrastructure.repositories.InMemoryAuthorRepository;
+import infrastructure.repositories.InMemoryBookRepository;
+import infrastructure.repositories.InMemoryCustomerRepository;
+import infrastructure.repositories.InMemoryLoansRepository;
 
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.Scanner;
 
 public class LibraryMenu {
-    private Library library;
-    private Scanner scanner = new Scanner(System.in);
+    private AuthorRepository authorRepository = new InMemoryAuthorRepository();
+    private BookRepository bookRepository = new InMemoryBookRepository();
+    private LoanRepository loanRepository = new InMemoryLoansRepository();
+    private CustomerRepository customerRepository = new InMemoryCustomerRepository();
+    private LoanService loanService = new LoanService(loanRepository);
     private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private Scanner scanner = new Scanner(System.in);
+
+    Library library = new Library(authorRepository, bookRepository, customerRepository, loanService);
 
     public LibraryMenu(Library library) {
         this.library = library;
@@ -80,7 +96,7 @@ public class LibraryMenu {
 
         try {
             LocalDate birthDate = LocalDate.parse(authorBirthDate, formatter);
-            library.addAuthor(new Author(authorName, birthDate));
+            library.insertAuthor(new Author(authorName, birthDate));
             System.out.println("Autor cadastrado com sucesso.");
         } catch (DateTimeException e) {
             System.out.println("Data inválida.");
@@ -90,6 +106,7 @@ public class LibraryMenu {
     private void registerBook() {
         if (library.getAllAuthors().isEmpty()) {
             System.out.println("Cadastre um autor antes de adicionar um livro.");
+            return;
         }
 
         System.out.print("Digite o título do livro: ");
@@ -107,7 +124,7 @@ public class LibraryMenu {
         }
 
         Author selectedAuthor = library.getAllAuthors().get(selected - 1);
-        library.addBook(new Book(title, selectedAuthor));
+        library.insertBook(new Book(title, selectedAuthor));
         System.out.println("Livro adicionado com sucesso.");
     }
 
@@ -123,7 +140,7 @@ public class LibraryMenu {
 
         try {
             LocalDate birthDate = LocalDate.parse(birthDateStr, formatter);
-            library.addCustomer(new Customer(customerName, customerEmail, birthDate));
+            library.insertCustomer(new Customer(customerName, customerEmail, birthDate));
             System.out.println("Cliente cadastrado com sucesso.");
         } catch (DateTimeException e) {
             System.out.println("Data inválida.");
@@ -131,21 +148,21 @@ public class LibraryMenu {
     }
 
     private void registerLoan() throws LoanAlreadyMade {
-        if (library.getAllCustomers().isEmpty() || library.getAllBooks().isEmpty()) {
+        if (library.getAllCustomer().isEmpty() || library.getAllBooks().isEmpty()) {
             System.out.println("É necessário ter clientes e livros cadastrados.");
         }
 
         System.out.println("Selecione o cliente:");
-        for (int i = 0; i < library.getAllCustomers().size(); i++) {
-            System.out.println((i + 1) + " - " + library.getAllCustomers().get(i));
+        for (int i = 0; i < library.getAllCustomer().size(); i++) {
+            System.out.println((i + 1) + " - " + library.getAllCustomer().get(i));
         }
         int selectedCustomer = scanner.nextInt();
         scanner.nextLine();
 
-        if (selectedCustomer < 1 || selectedCustomer > library.getAllCustomers().size()) {
+        if (selectedCustomer < 1 || selectedCustomer > library.getAllCustomer().size()) {
             System.out.println("Cliente inválido.");
         }
-        Customer customer = library.getAllCustomers().get(selectedCustomer - 1);
+        Customer customer = library.getAllCustomer().get(selectedCustomer - 1);
 
         System.out.println("Selecione o livro:");
         for (int i = 0; i < library.getAllBooks().size(); i++) {
@@ -159,7 +176,7 @@ public class LibraryMenu {
         }
 
         Book book = library.getAllBooks().get(selectedBook - 1);
-        library.addLoan(customer, book);
+        library.makeLoan(customer, book);
         System.out.println("Empréstimo realizado.");
     }
 
@@ -170,14 +187,40 @@ public class LibraryMenu {
         System.out.print("Digite o título do livro: ");
         String title = scanner.nextLine();
 
-        library.returnLoan(email, title);
+        Optional<Customer> customerEmail = library.getCustomerByEmail(email);
+        Optional<Book> bookTitle = library.getBookByTitle(title);
+
+        if(customerEmail.isEmpty()) {
+            System.out.println("Cliente não encontrado.");
+            return;
+        }
+
+        if (bookTitle.isEmpty()) {
+            System.out.println("Livro não encontrado.");
+            return;
+        }
+
+        Customer customer = customerEmail.get();
+        Book book = bookTitle.get();
+
+        library.returnLoan(customer, book);
         System.out.println("Devolução registrada.");
     }
 
     private void getLoanByCustomer() {
         System.out.print("Digite o email do cliente: ");
         String email = scanner.nextLine();
-        System.out.println(library.getLoanByCustomer(email));
+
+        Optional<Customer> customerEmail = library.getCustomerByEmail(email);
+
+        if(customerEmail.isEmpty()) {
+            System.out.println("Cliente não encontrado.");
+            return;
+        }
+
+        Customer customer = customerEmail.get();
+
+        System.out.println(library.getLoansByCustomer(customer));
     }
 
     private void getLoanByBookTitle() {
@@ -195,6 +238,6 @@ public class LibraryMenu {
     private void getBookByAuthor() {
         System.out.print("Digite o nome do autor: ");
         String authorName = scanner.nextLine();
-        System.out.println(library.getBooksByAuthor(authorName));
+        System.out.println(library.getAllAuthorBooks(authorName));
     }
 }
